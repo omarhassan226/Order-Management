@@ -51,8 +51,15 @@ class UserService {
                 throw new ConflictError('Email already exists');
             }
 
+            // Map password to password_hash for the model
+            const userDataToCreate = { ...userData };
+            if (userDataToCreate.password) {
+                userDataToCreate.password_hash = userDataToCreate.password;
+                delete userDataToCreate.password;
+            }
+
             // Create user
-            const user = await userRepository.create(userData);
+            const user = await userRepository.create(userDataToCreate);
             logger.info(`User created: ${user.username}`);
 
             return user.toSafeObject();
@@ -82,8 +89,26 @@ class UserService {
                 }
             }
 
-            // Update user
-            const user = await userRepository.update(id, userData);
+            // Map password to password_hash for the model
+            const userDataToUpdate = { ...userData };
+            if (userDataToUpdate.password) {
+                // Get the user document to trigger the pre-save hook for password hashing
+                const userDoc = await userRepository.findById(id);
+                userDoc.password_hash = userDataToUpdate.password;
+                delete userDataToUpdate.password;
+
+                // Apply other updates
+                Object.keys(userDataToUpdate).forEach(key => {
+                    userDoc[key] = userDataToUpdate[key];
+                });
+
+                await userDoc.save();
+                logger.info(`User updated: ${userDoc.username}`);
+                return userDoc.toSafeObject();
+            }
+
+            // Update user (no password change)
+            const user = await userRepository.update(id, userDataToUpdate);
             logger.info(`User updated: ${user.username}`);
 
             return user.toSafeObject();
