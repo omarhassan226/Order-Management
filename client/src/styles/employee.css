@@ -1,0 +1,207 @@
+/* Employee Dashboard Styles */
+.employee-dashboard {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+.dashboard-header {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-icon {
+    font-size: 2.5rem;
+}
+
+.user-info h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.user-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Order Status Banner */
+.order-status {
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 500;
+}
+
+.status-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.status-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+/* Category Filter */
+.category-filter {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    padding: 0.6rem 1.25rem;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-color);
+}
+
+.category-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.category-btn:hover:not(.active) {
+    background: var(--bg-secondary);
+}
+
+/* Beverages Section */
+.beverages-section {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.beverages-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.beverages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+.beverage-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.beverage-card:hover:not(.out-of-stock) {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.beverage-card.out-of-stock {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.beverage-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+}
+
+.beverage-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.category-tag {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.stock-badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.stock-badge.out {
+    background: var(--danger);
+    color: white;
+}
+
+/* Order History Section */
+.history-section {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem 2rem;
+}
+
+.history-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.orders-list {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.beverage-name {
+    font-weight: 500;
+}
+
+.order-date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
