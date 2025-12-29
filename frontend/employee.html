@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب المشروبات - موظف</title>
+    <link rel="stylesheet" href="/css/employee.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="user-info">
+                    <h1>مرحباً، <span id="userName">...</span></h1>
+                    <p id="userDepartment">...</p>
+                </div>
+                <button class="btn-logout" onclick="logout()">تسجيل الخروج</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Order Status Alert -->
+            <div id="orderStatus" class="alert" style="display: none;"></div>
+
+            <!-- Beverages Section -->
+            <section class="beverages-section">
+                <h2>اختر مشروبك اليومي</h2>
+                <div class="category-filter">
+                    <button class="filter-btn active" data-category="all">الكل</button>
+                    <button class="filter-btn" data-category="coffee">قهوة</button>
+                    <button class="filter-btn" data-category="tea">شاي</button>
+                    <button class="filter-btn" data-category="juice">عصير</button>
+                    <button class="filter-btn" data-category="smoothie">سموذي</button>
+                </div>
+                <div id="beveragesGrid" class="beverages-grid"></div>
+            </section>
+
+            <!-- Order Modal -->
+            <div id="orderModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>تخصيص طلبك</h3>
+                        <button class="close-btn" onclick="closeOrderModal()">&times;</button>
+                    </div>
+                    <form id="orderForm" class="order-form">
+                        <input type="hidden" id="selectedBeverageId">
+
+                        <div class="selected-beverage">
+                            <h4 id="selectedBeverageName"></h4>
+                        </div>
+
+                        <div class="form-group">
+                            <label>حجم الكوب</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="cup_size" value="small" checked>
+                                    <span>صغير</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="cup_size" value="large">
+                                    <span>كبير</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>كمية السكر</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sugar_quantity" value="none" checked>
+                                    <span>بدون</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sugar_quantity" value="1">
+                                    <span>1</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sugar_quantity" value="2">
+                                    <span>2</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>إضافات (اختياري)</label>
+                            <input type="text" id="addOns" placeholder="مثال: حليب، قرفة، فانيليا...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>ملاحظات</label>
+                            <textarea id="remarks" rows="3" placeholder="أي ملاحظات خاصة..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">تأكيد الطلب</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order History -->
+            <section class="history-section">
+                <h2>سجل طلباتي</h2>
+                <div id="orderHistory" class="order-history"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script src="/js/employee.js"></script>
+</body>
+
+</html>

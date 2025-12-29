@@ -1,0 +1,457 @@
+:root {
+    --primary: #6366f1;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --bg: #f9fafb;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info h1 {
+    font-size: 1.75rem;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.user-info h1 span {
+    color: var(--primary);
+}
+
+.user-info p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.btn-logout {
+    padding: 0.75rem 1.5rem;
+    background: var(--error);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.alert-warning {
+    background: #fef3c7;
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.beverages-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.beverages-section h2 {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.category-filter {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: var(--text);
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.beverages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.beverage-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.beverage-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.beverage-card.out-of-stock {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.beverage-card.out-of-stock:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.beverage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.beverage-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.stock-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.stock-good {
+    background: #d1fae5;
+    color: var(--success);
+}
+
+.stock-low {
+    background: #fef3c7;
+    color: var(--warning);
+}
+
+.stock-out {
+    background: #fee2e2;
+    color: var(--error);
+}
+
+.beverage-description {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.beverage-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: var(--text);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-light);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.order-form {
+    padding: 2rem;
+}
+
+.selected-beverage {
+    background: var(--bg);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.selected-beverage h4 {
+    color: var(--primary);
+    font-size: 1.25rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-label {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.radio-label:has(input:checked) {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.radio-label input {
+    display: none;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 0.875rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), #4f46e5);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+}
+
+/* Order History */
+.history-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.history-section h2 {
+    font-size: 1.5rem;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.order-history {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.order-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.order-details h4 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.order-details p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.order-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge-pending {
+    background: #fef3c7;
+    color: var(--warning);
+}
+
+.badge-fulfilled {
+    background: #d1fae5;
+    color: var(--success);
+}
+
+.badge-cancelled {
+    background: #fee2e2;
+    color: var(--error);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .beverages-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-filter {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+}
