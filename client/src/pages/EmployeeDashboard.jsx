@@ -2,10 +2,12 @@
  * Employee Dashboard Page
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { beverageAPI, orderAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
+import NotificationPanel from '../components/common/NotificationPanel';
 import '../styles/employee.css';
 
 const CATEGORIES = {
@@ -33,12 +35,14 @@ const MAX_ORDERS_PER_DAY = 3;
 
 const EmployeeDashboard = () => {
     const { user, logout } = useAuth();
+    const { notifications } = useNotifications();
     const [beverages, setBeverages] = useState([]);
     const [orders, setOrders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [remainingOrders, setRemainingOrders] = useState(MAX_ORDERS_PER_DAY);
     const [loading, setLoading] = useState(true);
     const [orderModal, setOrderModal] = useState({ open: false, beverage: null });
+    const lastNotificationRef = useRef(null);
     const [orderForm, setOrderForm] = useState({
         cup_size: 'small',
         sugar_quantity: 'none',
@@ -71,10 +75,20 @@ const EmployeeDashboard = () => {
 
     useEffect(() => {
         loadData();
-        // Poll for order status updates
-        const interval = setInterval(loadData, 30000);
-        return () => clearInterval(interval);
     }, [loadData]);
+
+    // Auto-refresh when order status changes (fulfilled/cancelled)
+    useEffect(() => {
+        if (notifications.length > 0) {
+            const latestNotification = notifications[0];
+            if (lastNotificationRef.current !== latestNotification.timestamp &&
+                (latestNotification.type === 'order_fulfilled' ||
+                    latestNotification.type === 'order_cancelled')) {
+                lastNotificationRef.current = latestNotification.timestamp;
+                loadData();
+            }
+        }
+    }, [notifications, loadData]);
 
     const filteredBeverages = beverages.filter(
         b => selectedCategory === 'all' || b.category === selectedCategory
@@ -136,9 +150,12 @@ const EmployeeDashboard = () => {
                             <p>{user.department || 'لا يوجد قسم'}</p>
                         </div>
                     </div>
-                    <button className="btn-logout" onClick={logout}>
-                        تسجيل الخروج
-                    </button>
+                    <div className="header-actions">
+                        {/* <NotificationPanel /> */}
+                        <button className="btn-logout" onClick={logout}>
+                            تسجيل الخروج
+                        </button>
+                    </div>
                 </div>
             </header>
 

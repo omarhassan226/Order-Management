@@ -2,10 +2,12 @@
  * Admin Dashboard Page
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { reportAPI, beverageAPI, orderAPI, userAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
+import NotificationPanel from '../components/common/NotificationPanel';
 import '../styles/admin.css';
 
 const TABS = [
@@ -31,8 +33,17 @@ const ROLES = {
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
+    const { notifications } = useNotifications();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [loading, setLoading] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const lastNotificationRef = useRef(null);
+
+    // Close sidebar when tab changes on mobile
+    const handleTabChange = (tabId) => {
+        setActiveTab(tabId);
+        setSidebarOpen(false);
+    };
 
     // Dashboard state
     const [stats, setStats] = useState({ dailyOrdersCount: 0, lowStockCount: 0, outOfStockCount: 0, totalBeverages: 0 });
@@ -119,6 +130,22 @@ const AdminDashboard = () => {
         }
     }, [activeTab, loadDashboard, loadBeverages, loadOrders, loadUsers]);
 
+    // Auto-refresh when new order notifications arrive
+    useEffect(() => {
+        if (notifications.length > 0) {
+            const latestNotification = notifications[0];
+            if (lastNotificationRef.current !== latestNotification.timestamp &&
+                (latestNotification.type === 'new_order' ||
+                    latestNotification.type === 'order_fulfilled' ||
+                    latestNotification.type === 'order_cancelled')) {
+                lastNotificationRef.current = latestNotification.timestamp;
+                // Refresh current tab data
+                if (activeTab === 'orders') loadOrders();
+                if (activeTab === 'dashboard') loadDashboard();
+            }
+        }
+    }, [notifications, activeTab, loadOrders, loadDashboard]);
+
     // Beverage handlers
     const handleSaveBeverage = async (formData) => {
         try {
@@ -199,11 +226,39 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard">
+            {/* Mobile Header with Hamburger */}
+            <header className="mobile-header">
+                <button
+                    className="hamburger-btn"
+                    onClick={() => setSidebarOpen(true)}
+                    aria-label="فتح القائمة"
+                >
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
+                </button>
+                <h1 className="mobile-title">☕ لوحة التحكم</h1>
+                <div className="mobile-user">👤</div>
+            </header>
+
+            {/* Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            ></div>
+
             {/* Sidebar */}
-            <aside className="sidebar">
+            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
                     <span className="logo">☕</span>
                     <h2>لوحة التحكم</h2>
+                    <button
+                        className="sidebar-close-btn"
+                        onClick={() => setSidebarOpen(false)}
+                        aria-label="إغلاق القائمة"
+                    >
+                        ✕
+                    </button>
                 </div>
 
                 <nav className="sidebar-nav">
@@ -211,7 +266,7 @@ const AdminDashboard = () => {
                         <button
                             key={tab.id}
                             className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                            onClick={() => setActiveTab(tab.id)}
+                            onClick={() => handleTabChange(tab.id)}
                         >
                             <span className="nav-icon">{tab.icon}</span>
                             <span className="nav-label">{tab.label}</span>
@@ -222,6 +277,7 @@ const AdminDashboard = () => {
                 <div className="sidebar-footer">
                     <div className="user-info">
                         <span>👤 {user.full_name}</span>
+                        {/* <NotificationPanel /> */}
                     </div>
                     <button className="btn-logout" onClick={logout}>خروج</button>
                 </div>

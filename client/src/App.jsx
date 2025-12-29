@@ -5,6 +5,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Pages
@@ -19,51 +20,54 @@ import './styles/global.css';
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
+      <NotificationProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
 
-          {/* Employee Routes */}
-          <Route
-            path="/employee"
-            element={
-              <ProtectedRoute allowedRoles={['employee']}>
-                <EmployeeDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Employee Routes */}
+            <Route
+              path="/employee"
+              element={
+                <ProtectedRoute allowedRoles={['employee']}>
+                  <EmployeeDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Office Boy Routes */}
-          <Route
-            path="/office-boy"
-            element={
-              <ProtectedRoute allowedRoles={['office_boy', 'admin']}>
-                <OfficeBoyDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Office Boy Routes */}
+            <Route
+              path="/office-boy"
+              element={
+                <ProtectedRoute allowedRoles={['office_boy', 'admin']}>
+                  <OfficeBoyDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Default Redirect */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+            {/* Default Redirect */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
 
-        {/* Toast Container */}
-        <Toaster position="top-center" />
-      </BrowserRouter>
+          {/* Toast Container */}
+          <Toaster position="top-center" />
+        </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
 
 export default App;
+

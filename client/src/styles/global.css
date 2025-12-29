@@ -91,6 +91,47 @@ body {
     }
 }
 
+/* Dashboard Header */
+.dashboard-header {
+    background: var(--bg-secondary);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content .user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-content .user-icon {
+    font-size: 2rem;
+}
+
+.header-content .user-info h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.header-content .user-info p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* Buttons */
 button {
     font-family: inherit;
@@ -360,4 +401,125 @@ button {
     align-items: center;
     justify-content: center;
     z-index: 999;
+}
+
+/* Global Responsive Styles */
+@media (max-width: 768px) {
+
+    /* Modal */
+    .modal-overlay {
+        padding: 0.75rem;
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 1.25rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.25rem;
+        flex-direction: column-reverse;
+    }
+
+    .modal-footer button {
+        width: 100%;
+    }
+
+    /* Forms */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.625rem 0.875rem;
+        font-size: 16px;
+        /* Prevent zoom on iOS */
+    }
+
+    /* Tables */
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    /* Badges */
+    .badge {
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Modal */
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal-content {
+        max-height: 90vh;
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+    }
+
+    .modal-header {
+        padding: 0.875rem 1rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-footer {
+        padding: 0.875rem 1rem;
+    }
+
+    /* Forms */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+    }
 }

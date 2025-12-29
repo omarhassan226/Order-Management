@@ -6,6 +6,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const http = require('http');
 
 const env = require('./config/env');
 const routes = require('./routes');
@@ -13,8 +14,10 @@ const { errorHandler, notFound } = require('./middleware/error.middleware');
 const { logRequest } = require('./middleware/logger.middleware');
 const seedUtil = require('./utils/seed.util');
 const logger = require('./utils/logger.util');
+const socketService = require('./services/socket.service');
 
 const app = express();
+const server = http.createServer(app);
 
 // Middleware
 app.use(cors());
@@ -81,10 +84,14 @@ const startServer = async () => {
             process.exit(1);
         }
 
+        // Initialize Socket.IO
+        socketService.initialize(server);
+
         // Start listening
-        const server = app.listen(env.PORT, () => {
+        server.listen(env.PORT, () => {
             logger.info(`\n🚀 Server is running on http://localhost:${env.PORT}`);
             logger.info(`📊 API endpoints available at http://localhost:${env.PORT}/api`);
+            logger.info(`🔌 WebSocket ready for real-time notifications`);
             logger.info(`🌍 Frontend available at http://localhost:${env.PORT}`);
             logger.info(`\n📝 To get started, log in with one of the default accounts.`);
             logger.info(`Environment: ${env.NODE_ENV}\n`);

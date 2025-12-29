@@ -9,6 +9,7 @@ const inventoryRepository = require('../repositories/inventory.repository');
 const { ValidationError, ConflictError } = require('../utils/error.util');
 const logger = require('../utils/logger.util');
 const { ORDER_STATUS } = require('../config/constants');
+const socketService = require('./socket.service');
 
 class OrderService {
     async getAllOrders(filters = {}) {
@@ -52,7 +53,21 @@ class OrderService {
             const order = await orderRepository.create(orderData);
             logger.info(`Order created: ${order._id}`);
 
-            return await this.getOrderById(order._id);
+            // Get full order with details for notification
+            const fullOrder = await this.getOrderById(order._id);
+
+            // Emit real-time notification to office boys and admins
+            socketService.emitNewOrder({
+                _id: fullOrder._id,
+                employee: fullOrder.employee_id,
+                beverage: fullOrder.beverage_id,
+                cup_size: fullOrder.cup_size,
+                sugar_quantity: fullOrder.sugar_quantity,
+                remarks: fullOrder.remarks,
+                createdAt: fullOrder.createdAt,
+            });
+
+            return fullOrder;
         } catch (error) {
             if (error instanceof ConflictError || error instanceof ValidationError) throw error;
             logger.error('Error creating order:', error);
@@ -77,8 +92,26 @@ class OrderService {
 
                 // Update order
                 await order.fulfill(userId);
+
+                // Get full order details and emit notification to employee
+                const fulfilledOrder = await this.getOrderById(id);
+                socketService.emitOrderFulfilled({
+                    _id: fulfilledOrder._id,
+                    employee_id: fulfilledOrder.employee_id,
+                    beverage: fulfilledOrder.beverage_id,
+                    fulfilled_at: fulfilledOrder.fulfilled_at,
+                });
             } else if (status === ORDER_STATUS.CANCELLED) {
                 await order.cancel();
+
+                // Emit cancellation notification
+                const cancelledOrder = await this.getOrderById(id);
+                socketService.emitOrderCancelled({
+                    _id: cancelledOrder._id,
+                    employee_id: cancelledOrder.employee_id,
+                    beverage: cancelledOrder.beverage_id,
+                    employee: cancelledOrder.employee_id,
+                }, userId);
             }
 
             logger.info(`Order ${id} status updated to ${status}`);

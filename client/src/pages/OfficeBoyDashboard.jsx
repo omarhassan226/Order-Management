@@ -4,8 +4,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNotifications } from '../context/NotificationContext';
 import { orderAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
+import NotificationPanel from '../components/common/NotificationPanel';
 import '../styles/office-boy.css';
 
 const CUP_SIZES = {
@@ -23,32 +25,16 @@ const SUGAR_QUANTITIES = {
 
 const OfficeBoyDashboard = () => {
     const { user, logout } = useAuth();
+    const { notifications } = useNotifications();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fulfillingId, setFulfillingId] = useState(null);
-    const lastPendingCount = useRef(0);
+    const lastNotificationRef = useRef(null);
 
-    const loadOrders = useCallback(async (showNewOrderNotification = false) => {
+    const loadOrders = useCallback(async () => {
         try {
             const data = await orderAPI.getToday();
-            const newOrders = data.orders || [];
-
-            // Check for new pending orders (for notifications)
-            const newPendingCount = newOrders.filter(o => o.status === 'pending').length;
-            if (showNewOrderNotification && newPendingCount > lastPendingCount.current && lastPendingCount.current > 0) {
-                const diff = newPendingCount - lastPendingCount.current;
-                Toast.info(`🔔 لديك ${diff} طلب${diff > 1 ? 'ات' : ''} جديد${diff > 1 ? 'ة' : ''}`);
-
-                // Browser notification
-                if (Notification.permission === 'granted' && document.hidden) {
-                    new Notification('🔔 طلب جديد!', {
-                        body: `لديك ${diff} طلب${diff > 1 ? 'ات' : ''} جديد${diff > 1 ? 'ة' : ''}`,
-                    });
-                }
-            }
-
-            lastPendingCount.current = newPendingCount;
-            setOrders(newOrders);
+            setOrders(data.orders || []);
         } catch (error) {
             Toast.error('فشل تحميل الطلبات');
             console.error(error);
@@ -57,18 +43,24 @@ const OfficeBoyDashboard = () => {
         }
     }, []);
 
+    // Initial load
     useEffect(() => {
-        // Request notification permission
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-        }
-
-        loadOrders(false);
-
-        // Poll for new orders
-        const interval = setInterval(() => loadOrders(true), 30000);
-        return () => clearInterval(interval);
+        loadOrders();
     }, [loadOrders]);
+
+    // Reload orders when new notifications arrive
+    useEffect(() => {
+        if (notifications.length > 0) {
+            const latestNotification = notifications[0];
+            // Only reload if it's a new notification and it's order-related
+            if (lastNotificationRef.current !== latestNotification.timestamp &&
+                (latestNotification.type === 'new_order' ||
+                    latestNotification.type === 'order_cancelled')) {
+                lastNotificationRef.current = latestNotification.timestamp;
+                loadOrders();
+            }
+        }
+    }, [notifications, loadOrders]);
 
     const pendingOrders = orders.filter(o => o.status === 'pending');
     const fulfilledOrders = orders.filter(o => o.status === 'fulfilled');
@@ -105,9 +97,12 @@ const OfficeBoyDashboard = () => {
                             <p>مسؤول تنفيذ الطلبات</p>
                         </div>
                     </div>
-                    <button className="btn-logout" onClick={logout}>
-                        تسجيل الخروج
-                    </button>
+                    <div className="header-actions">
+                        <NotificationPanel />
+                        <button className="btn-logout" onClick={logout}>
+                            تسجيل الخروج
+                        </button>
+                    </div>
                 </div>
             </header>
 

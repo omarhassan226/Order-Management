@@ -10,25 +10,28 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const userData = localStorage.getItem('user_data');
-        const token = localStorage.getItem('auth_token');
+        const storedToken = localStorage.getItem('auth_token');
 
-        if (userData && token) {
+        if (userData && storedToken) {
             setUser(JSON.parse(userData));
+            setToken(storedToken);
         }
         setLoading(false);
     }, []);
 
     const login = async (username, password) => {
         const response = await authAPI.login(username, password);
-        const { token, user: userData } = response;
+        const { token: newToken, user: userData } = response;
 
-        localStorage.setItem('auth_token', token);
+        localStorage.setItem('auth_token', newToken);
         localStorage.setItem('user_data', JSON.stringify(userData));
         setUser(userData);
+        setToken(newToken);
 
         return userData;
     };
@@ -42,6 +45,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_data');
             setUser(null);
+            setToken(null);
         }
     };
 
@@ -62,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{
             user,
+            token,
             loading,
             login,
             logout,
