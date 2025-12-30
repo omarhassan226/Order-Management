@@ -248,12 +248,19 @@ const EmployeeDashboard = () => {
                                 onClick={() => openOrderModal(beverage)}
                             >
                                 <div className="beverage-header">
-                                    <div className="beverage-icon">☕</div>
+
                                     <FavoriteButton
                                         beverageId={beverage._id}
                                         initialIsFavorite={isFavorite}
                                         size="small"
                                     />
+                                </div>
+                                <div className="beverage-image-cell">
+                                    {beverage.image_url ? (
+                                        <img src={beverage.image_url} alt={beverage.name} className="beverage-thumbnail" />
+                                    ) : (
+                                        <span className="beverage-icon-placeholder">☕</span>
+                                    )}
                                 </div>
                                 <h4>{beverage.name}</h4>
                                 <p className="category-tag">{CATEGORIES[beverage.category]}</p>
