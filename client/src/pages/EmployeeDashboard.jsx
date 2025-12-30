@@ -195,7 +195,13 @@ const EmployeeDashboard = () => {
                             className={`beverage-card ${beverage.stock_quantity === 0 ? 'out-of-stock' : ''}`}
                             onClick={() => openOrderModal(beverage)}
                         >
-                            <div className="beverage-icon">☕</div>
+                            <div className="beverage-image-container">
+                                {beverage.image_url ? (
+                                    <img src={beverage.image_url} alt={beverage.name} className="beverage-image" />
+                                ) : (
+                                    <div className="beverage-icon">☕</div>
+                                )}
+                            </div>
                             <h4>{beverage.name}</h4>
                             <p className="category-tag">{CATEGORIES[beverage.category]}</p>
                             {beverage.stock_quantity === 0 && (
