@@ -260,6 +260,25 @@
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
+.btn-favorites {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-favorites:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
 /* History Modal */
 .history-modal {
     max-width: 500px;

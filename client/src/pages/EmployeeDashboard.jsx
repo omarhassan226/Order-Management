@@ -198,6 +198,13 @@ const EmployeeDashboard = () => {
                         >
                             📋 طلباتي اليوم ({todayOrders.length})
                         </button>
+                        <button
+                            className="btn-favorites"
+                            onClick={() => window.alert('قريباً: صفحة المفضلات')}
+                            title="المشروبات المفضلة"
+                        >
+                            ❤️ المفضلة ({favoriteBeverageIds.length})
+                        </button>
                         <button className="btn-logout" onClick={logout}>
                             تسجيل الخروج
                         </button>

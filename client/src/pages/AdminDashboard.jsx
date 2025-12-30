@@ -391,6 +391,23 @@ const AdminDashboard = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            <div className="chart-card">
+                                <h3>⭐ المشروبات الأعلى تقييماً</h3>
+                                <div className="popular-list">
+                                    {topRatedBeverages.length === 0 ? (
+                                        <p className="empty-message">لا توجد تقييمات بعد</p>
+                                    ) : (
+                                        topRatedBeverages.map((item, index) => (
+                                            <div key={index} className="popular-item">
+                                                <span className="rank">#{index + 1}</span>
+                                                <span className="name">{item.beverage?.name || 'مشروب'}</span>
+                                                <span className="count">⭐ {item.averageRating.toFixed(1)} ({item.totalRatings})</span>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}

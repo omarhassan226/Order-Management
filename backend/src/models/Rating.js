@@ -84,11 +84,7 @@ ratingSchema.statics.getTopRatedBeverages = async function (limit = 10) {
                 totalRatings: { $sum: 1 },
             },
         },
-        {
-            $match: {
-                totalRatings: { $gte: 3 }, // Minimum 3 ratings to be considered
-            },
-        },
+        // Removed minimum ratings requirement to show all ratings
         {
             $sort: { averageRating: -1, totalRatings: -1 },
         },
