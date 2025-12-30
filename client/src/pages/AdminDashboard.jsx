@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { reportAPI, beverageAPI, orderAPI, userAPI } from '../services/api';
+import { reportAPI, beverageAPI, orderAPI, userAPI, ratingAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
 import '../styles/admin.css';
@@ -50,6 +50,7 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState({ dailyOrdersCount: 0, lowStockCount: 0, outOfStockCount: 0, totalBeverages: 0 });
     const [popularBeverages, setPopularBeverages] = useState([]);
     const [inventoryData, setInventoryData] = useState([]);
+    const [topRatedBeverages, setTopRatedBeverages] = useState([]);
 
     // Beverages state
     const [beverages, setBeverages] = useState([]);
@@ -72,15 +73,17 @@ const AdminDashboard = () => {
     const loadDashboard = useCallback(async () => {
         setLoading(true);
         try {
-            const [statsRes, popularRes, inventoryRes] = await Promise.allSettled([
+            const [statsRes, popularRes, inventoryRes, topRatedRes] = await Promise.allSettled([
                 reportAPI.getDashboardStats(),
                 reportAPI.getPopularBeverages(),
                 reportAPI.getInventoryStatus(),
+                ratingAPI.getTopRated(5),
             ]);
 
             if (statsRes.status === 'fulfilled') setStats(statsRes.value);
             if (popularRes.status === 'fulfilled') setPopularBeverages(popularRes.value.popularBeverages || []);
             if (inventoryRes.status === 'fulfilled') setInventoryData(inventoryRes.value.inventoryData || []);
+            if (topRatedRes.status === 'fulfilled') setTopRatedBeverages(topRatedRes.value.topRated || []);
         } catch (error) {
             console.error('Error loading dashboard:', error);
         } finally {

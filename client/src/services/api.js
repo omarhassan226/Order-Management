@@ -92,4 +92,58 @@ export const reportAPI = {
     exportExcel: (date) => `${EXPORT_BASE_URL}/reports/export/excel?date=${date}`,
 };
 
+// Rating endpoints
+export const ratingAPI = {
+    // Submit or update rating
+    upsertRating: (ratingData) => api.post('/ratings', ratingData),
+
+    // Get my rating for a beverage
+    getMyRating: (beverageId) => api.get(`/ratings/beverage/${beverageId}/my-rating`),
+
+    // Get all ratings for a beverage
+    getBeverageRatings: (beverageId) => api.get(`/ratings/beverage/${beverageId}`),
+
+    // Get my all ratings
+    getMyRatings: () => api.get('/ratings/my-ratings'),
+
+    // Delete my rating
+    deleteRating: (beverageId) => api.delete(`/ratings/beverage/${beverageId}`),
+
+    // Get top rated beverages
+    getTopRated: (limit = 10) => api.get(`/ratings/top-rated?limit=${limit}`),
+
+    // Get rating statistics
+    getStatistics: () => api.get('/ratings/statistics'),
+
+    // Get beverage with rating info
+    getBeverageWithRating: (beverageId) => api.get(`/ratings/beverage/${beverageId}/details`),
+};
+
+// Favorite endpoints
+export const favoriteAPI = {
+    // Get my favorites
+    getMyFavorites: () => api.get('/favorites'),
+
+    // Toggle favorite
+    toggleFavorite: (beverageId) => api.post('/favorites/toggle', { beverageId }),
+
+    // Add to favorites
+    addFavorite: (beverageId) => api.post('/favorites', { beverageId }),
+
+    // Remove from favorites
+    removeFavorite: (beverageId) => api.delete(`/favorites/${beverageId}`),
+
+    // Check if favorited
+    checkFavoriteStatus: (beverageId) => api.get(`/favorites/check/${beverageId}`),
+
+    // Get favorites count
+    getFavoritesCount: () => api.get('/favorites/count'),
+
+    // Get favorite beverage IDs
+    getFavoriteBeverageIds: () => api.get('/favorites/beverage-ids'),
+
+    // Get most favorited
+    getMostFavorited: (limit = 10) => api.get(`/favorites/most-favorited?limit=${limit}`),
+};
+
 export default api;
