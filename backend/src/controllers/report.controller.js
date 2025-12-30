@@ -61,6 +61,34 @@ class ReportController {
             next(error);
         }
     }
+
+    async getEmployeeStats(req, res, next) {
+        try {
+            const employeeStats = await reportService.getEmployeeStats();
+            return response.success(res, { employeeStats }, 'Employee stats retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getTopConsumers(req, res, next) {
+        try {
+            const limit = req.query.limit ? parseInt(req.query.limit) : 10;
+            const topConsumers = await reportService.getTopConsumers(limit);
+            return response.success(res, { topConsumers }, 'Top consumers retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getFastMovingItems(req, res, next) {
+        try {
+            const fastMovingItems = await reportService.getFastMovingItems();
+            return response.success(res, { fastMovingItems }, 'Fast moving items retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ReportController();

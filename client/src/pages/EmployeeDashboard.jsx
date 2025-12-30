@@ -37,11 +37,12 @@ const EmployeeDashboard = () => {
     const { user, logout } = useAuth();
     const { notifications } = useNotifications();
     const [beverages, setBeverages] = useState([]);
-    const [orders, setOrders] = useState([]);
+    const [todayOrders, setTodayOrders] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [remainingOrders, setRemainingOrders] = useState(MAX_ORDERS_PER_DAY);
     const [loading, setLoading] = useState(true);
     const [orderModal, setOrderModal] = useState({ open: false, beverage: null });
+    const [historyModal, setHistoryModal] = useState(false);
     const lastNotificationRef = useRef(null);
     const [orderForm, setOrderForm] = useState({
         cup_size: 'small',
@@ -51,20 +52,19 @@ const EmployeeDashboard = () => {
 
     const loadData = useCallback(async () => {
         try {
-            const [beveragesRes, ordersRes] = await Promise.all([
+            const [beveragesRes, todayOrdersRes] = await Promise.all([
                 beverageAPI.getAll(true),
-                orderAPI.getMyHistory(),
+                orderAPI.getMyToday(),
             ]);
 
             setBeverages(beveragesRes.beverages || []);
-            setOrders(ordersRes.orders || []);
+            setTodayOrders(todayOrdersRes.orders || []);
 
-            // Calculate remaining orders
-            const today = new Date().toISOString().split('T')[0];
-            const todayOrders = (ordersRes.orders || []).filter(
-                o => o.order_date?.split('T')[0] === today && o.status !== 'cancelled'
+            // Calculate remaining orders from today's orders
+            const activeOrders = (todayOrdersRes.orders || []).filter(
+                o => o.status !== 'cancelled'
             );
-            setRemainingOrders(MAX_ORDERS_PER_DAY - todayOrders.length);
+            setRemainingOrders(MAX_ORDERS_PER_DAY - activeOrders.length);
         } catch (error) {
             Toast.error('فشل تحميل البيانات');
             console.error(error);
@@ -127,9 +127,9 @@ const EmployeeDashboard = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            pending: { class: 'badge-warning', text: 'قيد الانتظار' },
-            fulfilled: { class: 'badge-success', text: 'تم التنفيذ' },
-            cancelled: { class: 'badge-danger', text: 'ملغى' },
+            pending: { class: 'badge-warning', text: 'قيد الانتظار', icon: '⏳' },
+            fulfilled: { class: 'badge-success', text: 'تم التنفيذ', icon: '✅' },
+            cancelled: { class: 'badge-danger', text: 'ملغى', icon: '❌' },
         };
         return badges[status] || badges.pending;
     };
@@ -151,7 +151,12 @@ const EmployeeDashboard = () => {
                         </div>
                     </div>
                     <div className="header-actions">
-                        {/* <NotificationPanel /> */}
+                        <button
+                            className="btn-history"
+                            onClick={() => setHistoryModal(true)}
+                        >
+                            📋 طلباتي اليوم ({todayOrders.length})
+                        </button>
                         <button className="btn-logout" onClick={logout}>
                             تسجيل الخروج
                         </button>
@@ -201,30 +206,6 @@ const EmployeeDashboard = () => {
                 </div>
             </section>
 
-            {/* Order History */}
-            <section className="history-section">
-                <h3>📋 سجل الطلبات</h3>
-                {orders.length === 0 ? (
-                    <p className="empty-message">لا توجد طلبات سابقة</p>
-                ) : (
-                    <div className="orders-list">
-                        {orders.slice(0, 10).map(order => (
-                            <div key={order._id} className="order-item">
-                                <div className="order-info">
-                                    <span className="beverage-name">{order.beverage_id?.name || 'مشروب'}</span>
-                                    <span className="order-date">
-                                        {new Date(order.order_date).toLocaleDateString('ar-EG')}
-                                    </span>
-                                </div>
-                                <span className={`badge ${getStatusBadge(order.status).class}`}>
-                                    {getStatusBadge(order.status).text}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </section>
-
             {/* Order Modal */}
             {orderModal.open && (
                 <div className="modal-overlay" onClick={closeOrderModal}>
@@ -272,6 +253,70 @@ const EmployeeDashboard = () => {
                         <div className="modal-footer">
                             <button className="btn-secondary" onClick={closeOrderModal}>إلغاء</button>
                             <button className="btn-primary" onClick={handleOrder}>تأكيد الطلب</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* History Modal */}
+            {historyModal && (
+                <div className="modal-overlay" onClick={() => setHistoryModal(false)}>
+                    <div className="modal-content history-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>📋 طلباتي اليوم</h3>
+                            <button className="btn-close" onClick={() => setHistoryModal(false)}>×</button>
+                        </div>
+
+                        <div className="modal-body">
+                            {todayOrders.length === 0 ? (
+                                <div className="empty-orders">
+                                    <span className="empty-icon">📭</span>
+                                    <p>لم تقم بأي طلبات اليوم</p>
+                                </div>
+                            ) : (
+                                <div className="orders-timeline">
+                                    {todayOrders.map(order => {
+                                        const statusInfo = getStatusBadge(order.status);
+                                        return (
+                                            <div key={order._id} className={`timeline-item ${order.status}`}>
+                                                <div className="timeline-icon">{statusInfo.icon}</div>
+                                                <div className="timeline-content">
+                                                    <div className="order-header">
+                                                        <span className="beverage-name">{order.beverage_id?.name || 'مشروب'}</span>
+                                                        <span className={`badge ${statusInfo.class}`}>
+                                                            {statusInfo.text}
+                                                        </span>
+                                                    </div>
+                                                    <div className="order-details">
+                                                        <span>🥤 {CUP_SIZES[order.cup_size] || order.cup_size}</span>
+                                                        <span>🍬 {SUGAR_QUANTITIES[order.sugar_quantity] || order.sugar_quantity}</span>
+                                                    </div>
+                                                    <div className="order-time">
+                                                        {new Date(order.createdAt).toLocaleTimeString('ar-EG', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </div>
+                                                    {order.remarks && (
+                                                        <div className="order-remarks">
+                                                            💬 {order.remarks}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="modal-footer">
+                            <div className="orders-summary">
+                                <span>إجمالي الطلبات: {todayOrders.length}</span>
+                                <span className="remaining">
+                                    المتبقي: {remainingOrders} من {MAX_ORDERS_PER_DAY}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

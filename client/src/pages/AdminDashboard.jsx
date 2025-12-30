@@ -15,6 +15,7 @@ const TABS = [
     { id: 'beverages', label: 'إدارة المشروبات', icon: '☕' },
     { id: 'orders', label: 'إدارة الطلبات', icon: '📋' },
     { id: 'users', label: 'إدارة المستخدمين', icon: '👥' },
+    { id: 'statistics', label: 'الإحصائيات', icon: '📉' },
     { id: 'reports', label: 'التقارير', icon: '📈' },
 ];
 
@@ -60,6 +61,12 @@ const AdminDashboard = () => {
     // Users state
     const [users, setUsers] = useState([]);
     const [userModal, setUserModal] = useState({ open: false, user: null });
+    const [employeeHistoryModal, setEmployeeHistoryModal] = useState({ open: false, employee: null, orders: [] });
+
+    // Statistics state
+    const [topConsumers, setTopConsumers] = useState([]);
+    const [employeeStats, setEmployeeStats] = useState([]);
+    const [fastMovingItems, setFastMovingItems] = useState([]);
 
     // Load dashboard data
     const loadDashboard = useCallback(async () => {
@@ -120,15 +127,50 @@ const AdminDashboard = () => {
         }
     }, []);
 
+    // Load statistics
+    const loadStatistics = useCallback(async () => {
+        setLoading(true);
+        try {
+            const [topConsumersRes, employeeStatsRes, fastMovingRes] = await Promise.allSettled([
+                reportAPI.getTopConsumers(10),
+                reportAPI.getEmployeeStats(),
+                reportAPI.getFastMovingItems(),
+            ]);
+
+            if (topConsumersRes.status === 'fulfilled') setTopConsumers(topConsumersRes.value.topConsumers || []);
+            if (employeeStatsRes.status === 'fulfilled') setEmployeeStats(employeeStatsRes.value.employeeStats || []);
+            if (fastMovingRes.status === 'fulfilled') setFastMovingItems(fastMovingRes.value.fastMovingItems || []);
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Load employee order history
+    const loadEmployeeOrders = async (employee) => {
+        try {
+            const res = await orderAPI.getAll({ employee_id: employee._id });
+            setEmployeeHistoryModal({
+                open: true,
+                employee,
+                orders: res.orders || []
+            });
+        } catch (error) {
+            Toast.error('فشل تحميل سجل الطلبات');
+        }
+    };
+
     useEffect(() => {
         switch (activeTab) {
             case 'dashboard': loadDashboard(); break;
             case 'beverages': loadBeverages(); break;
             case 'orders': loadOrders(); break;
             case 'users': loadUsers(); break;
+            case 'statistics': loadStatistics(); break;
             default: break;
         }
-    }, [activeTab, loadDashboard, loadBeverages, loadOrders, loadUsers]);
+    }, [activeTab, loadDashboard, loadBeverages, loadOrders, loadUsers, loadStatistics]);
 
     // Auto-refresh when new order notifications arrive
     useEffect(() => {
@@ -496,6 +538,127 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+                {/* Statistics Tab */}
+                {activeTab === 'statistics' && (
+                    <div className="tab-content">
+                        <h2>📉 الإحصائيات والتحليلات</h2>
+
+                        <div className="stats-sections">
+                            {/* Top Consumers Section */}
+                            <div className="stats-section">
+                                <div className="section-header">
+                                    <h3>🏆 أكثر الموظفين استهلاكاً (آخر 30 يوم)</h3>
+                                </div>
+                                <div className="top-consumers-list">
+                                    {topConsumers.length === 0 ? (
+                                        <p className="empty-message">لا توجد بيانات</p>
+                                    ) : (
+                                        topConsumers.map((item, index) => (
+                                            <div key={item.employee_id} className="consumer-item">
+                                                <div className="consumer-rank">
+                                                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                                </div>
+                                                <div className="consumer-info">
+                                                    <span className="consumer-name">{item.employee?.full_name || 'موظف'}</span>
+                                                    <span className="consumer-dept">{item.employee?.department || 'لا يوجد قسم'}</span>
+                                                </div>
+                                                <div className="consumer-count">
+                                                    <span className="count-value">{item.orderCount}</span>
+                                                    <span className="count-label">طلب</span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Fast Moving Items Section */}
+                            <div className="stats-section">
+                                <div className="section-header">
+                                    <h3>🔥 المشروبات الأكثر طلباً (آخر 7 أيام)</h3>
+                                </div>
+                                <div className="fast-moving-list">
+                                    {fastMovingItems.length === 0 ? (
+                                        <p className="empty-message">لا توجد بيانات</p>
+                                    ) : (
+                                        fastMovingItems.map((item, index) => (
+                                            <div key={item.beverage_id} className="fast-item">
+                                                <div className="fast-rank">#{index + 1}</div>
+                                                <div className="fast-info">
+                                                    <span className="fast-name">{item.beverage?.name || 'مشروب'}</span>
+                                                    <span className="fast-category">{CATEGORIES[item.beverage?.category] || 'أخرى'}</span>
+                                                </div>
+                                                <div className="fast-stats">
+                                                    <div className="fast-stat">
+                                                        <span className="stat-value">{item.orderCount}</span>
+                                                        <span className="stat-label">طلب</span>
+                                                    </div>
+                                                    <div className="fast-stat">
+                                                        <span className="stat-value">{item.dailyAverage?.toFixed(1) || '0'}</span>
+                                                        <span className="stat-label">يومياً</span>
+                                                    </div>
+                                                    <div className={`fast-stock ${item.beverage?.stock_quantity <= item.beverage?.min_stock_alert ? 'low' : ''}`}>
+                                                        <span className="stat-value">{item.beverage?.stock_quantity || 0}</span>
+                                                        <span className="stat-label">مخزون</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Employee Stats Table */}
+                            <div className="stats-section full-width">
+                                <div className="section-header">
+                                    <h3>👥 إحصائيات الموظفين</h3>
+                                </div>
+                                <div className="data-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>الموظف</th>
+                                                <th>القسم</th>
+                                                <th>إجمالي الطلبات</th>
+                                                <th>المنفذة</th>
+                                                <th>الملغاة</th>
+                                                <th>قيد الانتظار</th>
+                                                <th>آخر طلب</th>
+                                                <th>إجراءات</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {employeeStats.map(stat => (
+                                                <tr key={stat.employee_id}>
+                                                    <td>{stat.employee?.full_name || 'موظف'}</td>
+                                                    <td>{stat.employee?.department || '-'}</td>
+                                                    <td><span className="badge badge-info">{stat.totalOrders}</span></td>
+                                                    <td><span className="badge badge-success">{stat.fulfilledOrders}</span></td>
+                                                    <td><span className="badge badge-danger">{stat.cancelledOrders}</span></td>
+                                                    <td><span className="badge badge-warning">{stat.pendingOrders}</span></td>
+                                                    <td>
+                                                        {stat.lastOrderDate
+                                                            ? new Date(stat.lastOrderDate).toLocaleDateString('ar-EG')
+                                                            : '-'}
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            className="btn-sm btn-info"
+                                                            onClick={() => loadEmployeeOrders({ _id: stat.employee_id, ...stat.employee })}
+                                                        >
+                                                            📋 السجل
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Reports Tab */}
                 {activeTab === 'reports' && (
                     <div className="tab-content">
@@ -545,6 +708,56 @@ const AdminDashboard = () => {
                     onClose={() => setUserModal({ open: false, user: null })}
                     onSave={handleSaveUser}
                 />
+            )}
+
+            {/* Employee History Modal */}
+            {employeeHistoryModal.open && (
+                <div className="modal-overlay" onClick={() => setEmployeeHistoryModal({ open: false, employee: null, orders: [] })}>
+                    <div className="modal-content employee-history-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>📋 سجل طلبات: {employeeHistoryModal.employee?.full_name}</h3>
+                            <button className="btn-close" onClick={() => setEmployeeHistoryModal({ open: false, employee: null, orders: [] })}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            {employeeHistoryModal.orders.length === 0 ? (
+                                <p className="empty-message">لا توجد طلبات سابقة</p>
+                            ) : (
+                                <div className="history-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>المشروب</th>
+                                                <th>الحجم</th>
+                                                <th>الحالة</th>
+                                                <th>التاريخ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {employeeHistoryModal.orders.slice(0, 50).map(order => (
+                                                <tr key={order._id}>
+                                                    <td>{order.beverage_id?.name || 'مشروب'}</td>
+                                                    <td>{order.cup_size}</td>
+                                                    <td>
+                                                        <span className={`badge badge-${order.status === 'fulfilled' ? 'success' : order.status === 'cancelled' ? 'danger' : 'warning'}`}>
+                                                            {order.status === 'fulfilled' ? 'منفذ' : order.status === 'cancelled' ? 'ملغى' : 'قيد الانتظار'}
+                                                        </span>
+                                                    </td>
+                                                    <td>{new Date(order.order_date).toLocaleDateString('ar-EG')}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <div className="history-summary">
+                                إجمالي الطلبات: {employeeHistoryModal.orders.length}
+                            </div>
+                            <button className="btn-secondary" onClick={() => setEmployeeHistoryModal({ open: false, employee: null, orders: [] })}>إغلاق</button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -47,6 +47,25 @@ class OrderRepository extends BaseRepository {
     }
 
     /**
+     * Find today's orders for a specific employee
+     */
+    async findEmployeeTodayOrders(employeeId) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        return await this.findOrdersWithDetails({
+            employee_id: employeeId,
+            order_date: {
+                $gte: today,
+                $lt: tomorrow
+            }
+        });
+    }
+
+    /**
      * Find today's orders
      */
     async findTodayOrders() {
@@ -219,6 +238,168 @@ class OrderRepository extends BaseRepository {
      */
     async canEmployeeOrderToday(employeeId) {
         return await Order.canEmployeeOrderToday(employeeId);
+    }
+
+    /**
+     * Get employee statistics with order counts and history
+     */
+    async getEmployeeStats() {
+        try {
+            const result = await this.model.aggregate([
+                {
+                    $group: {
+                        _id: '$employee_id',
+                        totalOrders: { $sum: 1 },
+                        fulfilledOrders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'fulfilled'] }, 1, 0] }
+                        },
+                        cancelledOrders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
+                        },
+                        pendingOrders: {
+                            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+                        },
+                        lastOrderDate: { $max: '$order_date' }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'employee'
+                    }
+                },
+                { $unwind: { path: '$employee', preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        employee_id: '$_id',
+                        'employee.full_name': 1,
+                        'employee.email': 1,
+                        'employee.department': 1,
+                        totalOrders: 1,
+                        fulfilledOrders: 1,
+                        cancelledOrders: 1,
+                        pendingOrders: 1,
+                        lastOrderDate: 1
+                    }
+                },
+                { $sort: { totalOrders: -1 } }
+            ]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error in getEmployeeStats:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get top consumers (employees with most orders)
+     */
+    async getTopConsumers(limit = 10) {
+        try {
+            // Get orders from last 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+            const result = await this.model.aggregate([
+                {
+                    $match: {
+                        order_date: { $gte: thirtyDaysAgo },
+                        status: { $ne: 'cancelled' }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$employee_id',
+                        orderCount: { $sum: 1 },
+                        beverages: { $push: '$beverage_id' }
+                    }
+                },
+                { $sort: { orderCount: -1 } },
+                { $limit: limit },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'employee'
+                    }
+                },
+                { $unwind: { path: '$employee', preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        employee_id: '$_id',
+                        'employee.full_name': 1,
+                        'employee.email': 1,
+                        'employee.department': 1,
+                        orderCount: 1
+                    }
+                }
+            ]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error in getTopConsumers:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get fast moving items (beverages that run out quickly)
+     */
+    async getFastMovingItems() {
+        try {
+            // Get orders from last 7 days
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            sevenDaysAgo.setHours(0, 0, 0, 0);
+
+            const result = await this.model.aggregate([
+                {
+                    $match: {
+                        order_date: { $gte: sevenDaysAgo },
+                        status: 'fulfilled'
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$beverage_id',
+                        orderCount: { $sum: 1 },
+                        avgDailyOrders: { $avg: 1 }
+                    }
+                },
+                { $sort: { orderCount: -1 } },
+                { $limit: 10 },
+                {
+                    $lookup: {
+                        from: 'beverages',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'beverage'
+                    }
+                },
+                { $unwind: { path: '$beverage', preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        beverage_id: '$_id',
+                        'beverage.name': 1,
+                        'beverage.category': 1,
+                        'beverage.stock_quantity': 1,
+                        'beverage.min_stock_alert': 1,
+                        orderCount: 1,
+                        dailyAverage: { $divide: ['$orderCount', 7] }
+                    }
+                }
+            ]);
+
+            return result || [];
+        } catch (error) {
+            console.error('Error in getFastMovingItems:', error);
+            return [];
+        }
     }
 }
 

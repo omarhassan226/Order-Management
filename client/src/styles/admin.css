@@ -266,6 +266,234 @@
     font-weight: 500;
 }
 
+/* Statistics Sections */
+.stats-sections {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.stats-section {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+}
+
+.stats-section.full-width {
+    grid-column: 1 / -1;
+}
+
+.stats-section .section-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stats-section .section-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Top Consumers List */
+.top-consumers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.consumer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.consumer-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.consumer-rank {
+    font-size: 1.5rem;
+    min-width: 2.5rem;
+    text-align: center;
+}
+
+.consumer-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.consumer-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.consumer-dept {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.consumer-count {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark, #6366f1));
+    border-radius: var(--radius-md);
+    color: white;
+}
+
+.consumer-count .count-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.consumer-count .count-label {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+/* Fast Moving Items List */
+.fast-moving-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.fast-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.fast-item:hover {
+    transform: translateX(-4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.fast-rank {
+    font-weight: 700;
+    color: var(--primary);
+    min-width: 2rem;
+    font-size: 1rem;
+}
+
+.fast-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.fast-name {
+    font-weight: 600;
+}
+
+.fast-category {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.fast-stats {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.fast-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    min-width: 50px;
+}
+
+.fast-stat .stat-value {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.fast-stat .stat-label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.fast-stock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    background: var(--success);
+    color: white;
+    border-radius: var(--radius-sm);
+    min-width: 50px;
+}
+
+.fast-stock.low {
+    background: var(--warning);
+}
+
+.fast-stock .stat-value {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.fast-stock .stat-label {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+
+/* Badge Info (for stats) */
+.badge-info {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+}
+
+/* Button Info */
+.btn-info {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.btn-info:hover {
+    filter: brightness(1.1);
+}
+
+/* Employee History Modal */
+.employee-history-modal {
+    max-width: 700px;
+    max-height: 80vh;
+}
+
+.employee-history-modal .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.history-table {
+    width: 100%;
+}
+
+.history-table table {
+    width: 100%;
+}
+
+.history-summary {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .stats-grid {
@@ -470,6 +698,27 @@
     .report-actions a {
         text-align: center;
         width: 100%;
+    }
+
+    /* Statistics Sections - Mobile */
+    .stats-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .fast-stats {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .fast-stat,
+    .fast-stock {
+        min-width: 45px;
+        padding: 0.3rem 0.5rem;
+    }
+
+    .consumer-item,
+    .fast-item {
+        flex-wrap: wrap;
     }
 }
 

@@ -85,7 +85,7 @@ const Login = () => {
                     <p>حسابات تجريبية:</p>
                     <ul>
                         <li><strong>مدير:</strong> admin / admin123</li>
-                        <li><strong>موظف:</strong> ahmed / emp123</li>
+                        <li><strong>موظف:</strong> omar2 / password</li>
                         <li><strong>Office Boy:</strong> officeBoy / office123</li>
                     </ul>
                 </div>

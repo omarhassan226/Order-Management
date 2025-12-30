@@ -21,6 +21,9 @@ router.get('/today', authenticate, isAdminOrOfficeBoy, orderController.getTodayO
 // GET /api/orders/my-history - Get current user's order history (all authenticated users)
 router.get('/my-history', authenticate, orderController.getMyOrderHistory);
 
+// GET /api/orders/my-today - Get current user's today orders (all authenticated users)
+router.get('/my-today', authenticate, orderController.getMyTodayOrders);
+
 // GET /api/orders/:id - Get order by ID (all authenticated users)
 router.get('/:id', authenticate, orderIdValidator, validate, orderController.getOrderById);
 

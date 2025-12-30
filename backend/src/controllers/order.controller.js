@@ -95,6 +95,15 @@ class OrderController {
             next(error);
         }
     }
+
+    async getMyTodayOrders(req, res, next) {
+        try {
+            const orders = await orderService.getEmployeeTodayOrders(req.userId);
+            return response.success(res, { orders }, 'Today orders retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new OrderController();

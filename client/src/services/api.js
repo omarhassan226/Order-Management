@@ -4,9 +4,10 @@
  */
 
 import axios from 'axios';
+import { VITE_API_URL } from '../environment/development';
 
 // Use proxy in development, direct URL in production
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = `${VITE_API_URL}/api`;
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -71,6 +72,7 @@ export const orderAPI = {
     getAll: (filters = {}) => api.get('/orders', { params: filters }),
     getToday: () => api.get('/orders/today'),
     getMyHistory: () => api.get('/orders/my-history'),
+    getMyToday: () => api.get('/orders/my-today'),
     create: (orderData) => api.post('/orders', orderData),
     fulfill: (id) => api.patch(`/orders/${id}/fulfill`),
     cancel: (id) => api.patch(`/orders/${id}/cancel`),
@@ -83,6 +85,9 @@ export const reportAPI = {
     getPopularBeverages: () => api.get('/reports/popular'),
     getInventoryStatus: () => api.get('/reports/inventory'),
     getConsumptionTrends: (period = 'week') => api.get(`/reports/consumption?period=${period}`),
+    getEmployeeStats: () => api.get('/reports/employee-stats'),
+    getTopConsumers: (limit = 10) => api.get(`/reports/top-consumers?limit=${limit}`),
+    getFastMovingItems: () => api.get('/reports/fast-moving'),
     exportPDF: (date) => `${EXPORT_BASE_URL}/reports/export/pdf?date=${date}`,
     exportExcel: (date) => `${EXPORT_BASE_URL}/reports/export/excel?date=${date}`,
 };

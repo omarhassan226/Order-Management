@@ -146,6 +146,10 @@ class OrderService {
     async getEmployeeOrders(employeeId) {
         return await orderRepository.findByEmployee(employeeId);
     }
+
+    async getEmployeeTodayOrders(employeeId) {
+        return await orderRepository.findEmployeeTodayOrders(employeeId);
+    }
 }
 
 module.exports = new OrderService();

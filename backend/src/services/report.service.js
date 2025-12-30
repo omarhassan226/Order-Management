@@ -41,6 +41,18 @@ class ReportService {
         return await orderRepository.getConsumptionTrends(days);
     }
 
+    async getEmployeeStats() {
+        return await orderRepository.getEmployeeStats();
+    }
+
+    async getTopConsumers(limit = 10) {
+        return await orderRepository.getTopConsumers(limit);
+    }
+
+    async getFastMovingItems() {
+        return await orderRepository.getFastMovingItems();
+    }
+
     async generatePDF(date, res) {
         try {
             const orders = await orderRepository.findOrdersWithDetails({
