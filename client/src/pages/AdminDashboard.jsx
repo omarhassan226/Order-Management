@@ -406,6 +406,7 @@ const AdminDashboard = () => {
                             <table>
                                 <thead>
                                     <tr>
+                                        <th>الصورة</th>
                                         <th>الاسم</th>
                                         <th>الفئة</th>
                                         <th>المخزون</th>
@@ -416,6 +417,15 @@ const AdminDashboard = () => {
                                 <tbody>
                                     {beverages.map(beverage => (
                                         <tr key={beverage._id}>
+                                            <td>
+                                                <div className="beverage-image-cell">
+                                                    {beverage.image_url ? (
+                                                        <img src={beverage.image_url} alt={beverage.name} className="beverage-thumbnail" />
+                                                    ) : (
+                                                        <span className="beverage-icon-placeholder">☕</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td>{beverage.name}</td>
                                             <td>{CATEGORIES[beverage.category]}</td>
                                             <td>{beverage.stock_quantity} {beverage.unit}</td>
@@ -769,6 +779,7 @@ const BeverageModal = ({ beverage, onClose, onSave }) => {
         name: beverage?.name || '',
         category: beverage?.category || 'coffee',
         description: beverage?.description || '',
+        image_url: beverage?.image_url || '',
         stock_quantity: beverage?.stock_quantity || 0,
         min_stock_alert: beverage?.min_stock_alert || 10,
         is_active: beverage?.is_active ?? true,
@@ -816,6 +827,21 @@ const BeverageModal = ({ beverage, onClose, onSave }) => {
                             value={formData.description}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                         />
+                    </div>
+
+                    <div className="form-group">
+                        <label>رابط الصورة (Image URL)</label>
+                        <input
+                            type="text"
+                            value={formData.image_url}
+                            onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                            placeholder="https://example.com/image.jpg"
+                        />
+                        {formData.image_url && (
+                            <div className="image-preview">
+                                <img src={formData.image_url} alt="معاينة الصورة" onError={(e) => e.target.style.display = 'none'} />
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-row">
