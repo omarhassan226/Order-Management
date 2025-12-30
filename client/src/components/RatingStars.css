@@ -1,0 +1,98 @@
+/* Rating Stars Component Styles */
+
+.rating-stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.rating-stars .stars {
+    display: flex;
+    gap: 0.15rem;
+}
+
+.rating-stars .star {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rating-stars.interactive .star:hover {
+    transform: scale(1.1);
+}
+
+.rating-stars.interactive .star:active {
+    transform: scale(0.95);
+}
+
+.rating-stars.readonly .star {
+    cursor: default;
+    pointer-events: none;
+}
+
+.rating-stars .star.filled {
+    color: #ffc107;
+}
+
+.rating-stars .star.empty {
+    color: #e0e0e0;
+}
+
+/* Sizes */
+.rating-stars.small .star svg {
+    width: 16px;
+    height: 16px;
+}
+
+.rating-stars.medium .star svg {
+    width: 24px;
+    height: 24px;
+}
+
+.rating-stars.large .star svg {
+    width: 32px;
+    height: 32px;
+}
+
+.rating-stars .rating-count {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #666);
+    font-weight: 500;
+}
+
+/* Hover effect for interactive stars */
+.rating-stars.interactive .star {
+    filter: drop-shadow(0 0 0 transparent);
+}
+
+.rating-stars.interactive .star.filled {
+    filter: drop-shadow(0 1px 2px rgba(255, 193, 7, 0.3));
+}
+
+.rating-stars.interactive .star:hover {
+    filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.4));
+}
+
+/* Animation when rating changes */
+@keyframes starPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.rating-stars.interactive .star.filled {
+    animation: starPulse 0.3s ease-in-out;
+}

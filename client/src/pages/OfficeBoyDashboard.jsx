@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { orderAPI } from '../services/api';
+import { orderAPI, ratingAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
 import '../styles/office-boy.css';
@@ -29,14 +29,19 @@ const OfficeBoyDashboard = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fulfillingId, setFulfillingId] = useState(null);
+    const [topRatedBeverages, setTopRatedBeverages] = useState([]);
     const lastNotificationRef = useRef(null);
 
     const loadOrders = useCallback(async () => {
         try {
-            const data = await orderAPI.getToday();
-            setOrders(data.orders || []);
+            const [ordersData, topRatedData] = await Promise.all([
+                orderAPI.getToday(),
+                ratingAPI.getTopRated(5).catch(() => ({ topRated: [] })),
+            ]);
+            setOrders(ordersData.orders || []);
+            setTopRatedBeverages(topRatedData.topRated || []);
         } catch (error) {
-            Toast.error('فشل تحميل الطلبات');
+            Toast.error('فشل تحميل البيانات');
             console.error(error);
         } finally {
             setLoading(false);
@@ -123,6 +128,27 @@ const OfficeBoyDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Top Rated Beverages */}
+            {topRatedBeverages.length > 0 && (
+                <section className="popular-section">
+                    <h3>⭐ المشروبات الأكثر شعبية</h3>
+                    <div className="popular-grid">
+                        {topRatedBeverages.map((item, index) => (
+                            <div key={index} className="popular-card">
+                                <div className="popular-rank">#{index + 1}</div>
+                                <div className="popular-info">
+                                    <h4>{item.beverage?.name || 'مشروب'}</h4>
+                                    <div className="rating-info">
+                                        <span>⭐ {item.averageRating.toFixed(1)}</span>
+                                        <span className="reviews-count">({item.totalRatings} تقييم)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Pending Orders */}
             <section className="orders-section">

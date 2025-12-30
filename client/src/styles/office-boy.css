@@ -46,6 +46,69 @@
     font-size: 0.9rem;
 }
 
+/* Popular Beverages Section */
+.popular-section {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.popular-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.popular-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.popular-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    text-align: center;
+    border: 2px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.popular-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.popular-rank {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.popular-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.rating-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.rating-info span:first-child {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.reviews-count {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
 /* Orders Section */
 .orders-section {
     max-width: 800px;

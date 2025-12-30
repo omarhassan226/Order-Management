@@ -5,9 +5,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { beverageAPI, orderAPI } from '../services/api';
+import { beverageAPI, orderAPI, ratingAPI, favoriteAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
+import RatingStars from '../components/RatingStars';
+import FavoriteButton from '../components/FavoriteButton';
+import RatingModal from '../components/RatingModal';
 import '../styles/employee.css';
 
 const CATEGORIES = {
@@ -49,16 +52,34 @@ const EmployeeDashboard = () => {
         sugar_quantity: 'none',
         remarks: '',
     });
+    const [ratingModal, setRatingModal] = useState({ open: false, beverage: null });
+    const [favoriteBeverageIds, setFavoriteBeverageIds] = useState([]);
+    const [beverageRatings, setBeverageRatings] = useState({});
 
     const loadData = useCallback(async () => {
         try {
-            const [beveragesRes, todayOrdersRes] = await Promise.all([
+            const [beveragesRes, todayOrdersRes, favoritesRes, topRatedRes] = await Promise.all([
                 beverageAPI.getAll(true),
                 orderAPI.getMyToday(),
+                favoriteAPI.getFavoriteBeverageIds().catch(() => ({ beverageIds: [] })),
+                ratingAPI.getTopRated(20).catch(() => ({ topRated: [] })),
             ]);
 
             setBeverages(beveragesRes.beverages || []);
             setTodayOrders(todayOrdersRes.orders || []);
+            setFavoriteBeverageIds(favoritesRes.beverageIds || []);
+
+            // Create ratings map
+            const ratingsMap = {};
+            (topRatedRes.topRated || []).forEach(item => {
+                if (item.beverage_id) {
+                    ratingsMap[item.beverage_id] = {
+                        averageRating: item.averageRating,
+                        totalRatings: item.totalRatings,
+                    };
+                }
+            });
+            setBeverageRatings(ratingsMap);
 
             // Calculate remaining orders from today's orders
             const activeOrders = (todayOrdersRes.orders || []).filter(
@@ -125,6 +146,26 @@ const EmployeeDashboard = () => {
         }
     };
 
+    const openRatingModal = (beverage, e) => {
+        e.stopPropagation();
+        setRatingModal({ open: true, beverage });
+    };
+
+    const closeRatingModal = () => {
+        setRatingModal({ open: false, beverage: null });
+    };
+
+    const handleRatingSubmit = async (ratingData) => {
+        try {
+            await ratingAPI.upsertRating(ratingData);
+            Toast.success('تم إرسال التقييم بنجاح!');
+            closeRatingModal();
+            loadData(); // Reload to get updated ratings
+        } catch (error) {
+            Toast.error(error.message || 'فشل إرسال التقييم');
+        }
+    };
+
     const getStatusBadge = (status) => {
         const badges = {
             pending: { class: 'badge-warning', text: 'قيد الانتظار', icon: '⏳' },
@@ -156,6 +197,13 @@ const EmployeeDashboard = () => {
                             onClick={() => setHistoryModal(true)}
                         >
                             📋 طلباتي اليوم ({todayOrders.length})
+                        </button>
+                        <button
+                            className="btn-favorites"
+                            onClick={() => window.alert('قريباً: صفحة المفضلات')}
+                            title="المشروبات المفضلة"
+                        >
+                            ❤️ المفضلة ({favoriteBeverageIds.length})
                         </button>
                         <button className="btn-logout" onClick={logout}>
                             تسجيل الخروج
@@ -189,28 +237,67 @@ const EmployeeDashboard = () => {
             <section className="beverages-section">
                 <h3>🍵 المشروبات المتاحة</h3>
                 <div className="beverages-grid">
-                    {filteredBeverages.map(beverage => (
-                        <div
-                            key={beverage._id}
-                            className={`beverage-card ${beverage.stock_quantity === 0 ? 'out-of-stock' : ''}`}
-                            onClick={() => openOrderModal(beverage)}
-                        >
-                            <div className="beverage-image-container">
-                                {beverage.image_url ? (
-                                    <img src={beverage.image_url} alt={beverage.name} className="beverage-image" />
-                                ) : (
+                    {filteredBeverages.map(beverage => {
+                        const isFavorite = favoriteBeverageIds.includes(beverage._id);
+                        const ratingInfo = beverageRatings[beverage._id];
+
+                        return (
+                            <div
+                                key={beverage._id}
+                                className={`beverage-card ${beverage.stock_quantity === 0 ? 'out-of-stock' : ''}`}
+                                onClick={() => openOrderModal(beverage)}
+                            >
+                                <div className="beverage-header">
                                     <div className="beverage-icon">☕</div>
+                                    <FavoriteButton
+                                        beverageId={beverage._id}
+                                        initialIsFavorite={isFavorite}
+                                        size="small"
+                                    />
+                                </div>
+                                <h4>{beverage.name}</h4>
+                                <p className="category-tag">{CATEGORIES[beverage.category]}</p>
+
+                                {ratingInfo && (
+                                    <div className="rating-display" onClick={(e) => {
+                                        e.stopPropagation();
+                                        openRatingModal(beverage, e);
+                                    }}>
+                                        <RatingStars
+                                            rating={ratingInfo.averageRating}
+                                            readonly={true}
+                                            size="small"
+                                            showCount={true}
+                                            count={ratingInfo.totalRatings}
+                                        />
+                                    </div>
+                                )}
+
+                                <button
+                                    className="rate-btn"
+                                    onClick={(e) => openRatingModal(beverage, e)}
+                                    style={{ fontSize: '0.75rem', marginTop: '0.5rem', padding: '0.25rem 0.5rem' }}
+                                >
+                                    ⭐ قيّم المشروب
+                                </button>
+
+                                {beverage.stock_quantity === 0 && (
+                                    <span className="stock-badge out">غير متوفر</span>
                                 )}
                             </div>
-                            <h4>{beverage.name}</h4>
-                            <p className="category-tag">{CATEGORIES[beverage.category]}</p>
-                            {beverage.stock_quantity === 0 && (
-                                <span className="stock-badge out">غير متوفر</span>
-                            )}
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
+
+            {/* Rating Modal */}
+            {ratingModal.open && (
+                <RatingModal
+                    beverage={ratingModal.beverage}
+                    onSubmit={handleRatingSubmit}
+                    onClose={closeRatingModal}
+                />
+            )}
 
             {/* Order Modal */}
             {orderModal.open && (

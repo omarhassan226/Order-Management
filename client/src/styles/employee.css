@@ -131,9 +131,31 @@
     cursor: not-allowed;
 }
 
+.beverage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
 .beverage-icon {
     font-size: 3rem;
-    margin-bottom: 0.75rem;
+    flex: 1;
+}
+
+.beverage-image-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.beverage-image {
+    width: 100%;
+    max-width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
 }
 
 .beverage-card h4 {
@@ -144,6 +166,33 @@
 .category-tag {
     color: var(--text-muted);
     font-size: 0.85rem;
+}
+
+.rating-display {
+    margin: 0.75rem 0;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.rating-display:hover {
+    opacity: 0.8;
+}
+
+.rate-btn {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    width: 100%;
+}
+
+.rate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
 }
 
 .stock-badge {
@@ -224,6 +273,25 @@
 .btn-history:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-favorites {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-favorites:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 /* History Modal */

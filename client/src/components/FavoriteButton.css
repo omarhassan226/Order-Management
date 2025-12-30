@@ -1,0 +1,138 @@
+/* Favorite Button Styles */
+
+.favorite-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.favorite-btn:hover {
+    background: rgba(255, 0, 0, 0.1);
+    transform: scale(1.1);
+}
+
+.favorite-btn:active {
+    transform: scale(0.9);
+}
+
+.favorite-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.favorite-btn .heart-icon {
+    color: #ccc;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.favorite-btn.is-favorite .heart-icon {
+    color: #e74c3c;
+    animation: heartBeat 0.6s ease;
+}
+
+.favorite-btn:hover .heart-icon {
+    color: #e74c3c;
+}
+
+/* Sizes */
+.favorite-btn.small {
+    padding: 0.25rem;
+}
+
+.favorite-btn.small .heart-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.favorite-btn.medium {
+    padding: 0.375rem;
+}
+
+.favorite-btn.medium .heart-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.favorite-btn.large {
+    padding: 0.5rem;
+}
+
+.favorite-btn.large .heart-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Pulse effect when favorited */
+.favorite-btn.is-favorite::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(231, 76, 60, 0.3);
+    animation: pulseFavorite 1s ease-out;
+}
+
+/* Heart beat animation */
+@keyframes heartBeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    10%,
+    30% {
+        transform: scale(0.9);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: scale(1.1);
+    }
+
+    50%,
+    70% {
+        transform: scale(1.05);
+    }
+}
+
+/* Pulse animation */
+@keyframes pulseFavorite {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2);
+    }
+}
+
+/* Loading spinner */
+.favorite-btn.loading .heart-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

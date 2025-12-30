@@ -7,6 +7,8 @@ const User = require('./User');
 const Beverage = require('./Beverage');
 const Order = require('./Order');
 const InventoryTransaction = require('./InventoryTransaction');
+const Rating = require('./Rating');
+const Favorite = require('./Favorite');
 
 // Models are already defined with references via ObjectId
 // No need to define relationships like in Sequelize
@@ -17,4 +19,6 @@ module.exports = {
     Beverage,
     Order,
     InventoryTransaction,
+    Rating,
+    Favorite,
 };
