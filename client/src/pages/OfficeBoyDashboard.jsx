@@ -8,6 +8,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { orderAPI, ratingAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
+import BackgroundSlider from '../components/BackgroundSlider';
 import '../styles/office-boy.css';
 
 const CUP_SIZES = {
@@ -92,6 +93,7 @@ const OfficeBoyDashboard = () => {
 
     return (
         <div className="office-boy-dashboard">
+            <BackgroundSlider theme="officeboy" />
             {/* Header */}
             <header className="dashboard-header">
                 <div className="header-content">

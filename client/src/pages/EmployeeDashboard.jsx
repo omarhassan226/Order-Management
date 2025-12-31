@@ -11,6 +11,7 @@ import NotificationPanel from '../components/common/NotificationPanel';
 import RatingStars from '../components/RatingStars';
 import FavoriteButton from '../components/FavoriteButton';
 import RatingModal from '../components/RatingModal';
+import BackgroundSlider from '../components/BackgroundSlider';
 import '../styles/employee.css';
 
 const CATEGORIES = {
@@ -181,6 +182,7 @@ const EmployeeDashboard = () => {
 
     return (
         <div className="employee-dashboard">
+            <BackgroundSlider theme="employee" />
             {/* Header */}
             <header className="dashboard-header">
                 <div className="header-content">

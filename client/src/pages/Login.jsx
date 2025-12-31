@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Toast } from '../components/common/Toast';
+import BackgroundSlider from '../components/BackgroundSlider';
 import '../styles/login.css';
 
 const Login = () => {
@@ -42,6 +43,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <BackgroundSlider />
             <div className="login-card">
                 <div className="login-header">
                     <div className="logo">☕</div>

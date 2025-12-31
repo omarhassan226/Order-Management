@@ -8,6 +8,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { reportAPI, beverageAPI, orderAPI, userAPI, ratingAPI } from '../services/api';
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
+import BackgroundSlider from '../components/BackgroundSlider';
 import '../styles/admin.css';
 
 const TABS = [
@@ -271,6 +272,7 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard">
+            <BackgroundSlider theme="admin" />
             {/* Mobile Header with Hamburger */}
             <header className="mobile-header">
                 <button

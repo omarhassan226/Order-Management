@@ -1,14 +1,17 @@
 /* Login Page Styles */
 .login-container {
+    position: relative;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background: transparent;
 }
 
 .login-card {
+    position: relative;
+    z-index: 10;
     background: var(--bg-card);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
