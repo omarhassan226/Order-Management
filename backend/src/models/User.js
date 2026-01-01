@@ -52,6 +52,30 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+    work_start_time: {
+        type: String,
+        default: null,
+        trim: true,
+        validate: {
+            validator: function (v) {
+                if (!v) return true; // Allow null
+                return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+            },
+            message: 'Invalid time format. Use HH:MM format (e.g., 09:00)',
+        },
+    },
+    work_end_time: {
+        type: String,
+        default: null,
+        trim: true,
+        validate: {
+            validator: function (v) {
+                if (!v) return true; // Allow null
+                return /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+            },
+            message: 'Invalid time format. Use HH:MM format (e.g., 17:00)',
+        },
+    },
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

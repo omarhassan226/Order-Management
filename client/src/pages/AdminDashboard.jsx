@@ -538,6 +538,7 @@ const AdminDashboard = () => {
                                         <th>اسم المستخدم</th>
                                         <th>البريد</th>
                                         <th>الدور</th>
+                                        <th>ساعات العمل</th>
                                         <th>الحالة</th>
                                         <th>إجراءات</th>
                                     </tr>
@@ -549,6 +550,15 @@ const AdminDashboard = () => {
                                             <td>{u.username}</td>
                                             <td>{u.email}</td>
                                             <td>{ROLES[u.role]}</td>
+                                            <td>
+                                                {u.role === 'employee' && u.work_start_time && u.work_end_time ? (
+                                                    <span className="work-hours">🕐 {u.work_start_time} - {u.work_end_time}</span>
+                                                ) : u.role === 'employee' ? (
+                                                    <span className="work-hours-empty">غير محدد</span>
+                                                ) : (
+                                                    <span className="work-hours-na">-</span>
+                                                )}
+                                            </td>
                                             <td>
                                                 <span className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}>
                                                     {u.is_active ? 'نشط' : 'غير نشط'}
@@ -918,6 +928,8 @@ const UserModal = ({ user, onClose, onSave }) => {
         password: '',
         role: user?.role || 'employee',
         department: user?.department || '',
+        work_start_time: user?.work_start_time || '',
+        work_end_time: user?.work_end_time || '',
         is_active: user?.is_active ?? true,
     });
 
@@ -1001,6 +1013,30 @@ const UserModal = ({ user, onClose, onSave }) => {
                             />
                         </div>
                     </div>
+
+                    {formData.role === 'employee' && (
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>وقت بداية العمل</label>
+                                <input
+                                    type="time"
+                                    value={formData.work_start_time}
+                                    onChange={e => setFormData({ ...formData, work_start_time: e.target.value })}
+                                    placeholder="09:00"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>وقت نهاية العمل</label>
+                                <input
+                                    type="time"
+                                    value={formData.work_end_time}
+                                    onChange={e => setFormData({ ...formData, work_end_time: e.target.value })}
+                                    placeholder="17:00"
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="form-group">
                         <label className="checkbox-label">
