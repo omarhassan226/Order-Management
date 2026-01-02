@@ -88,6 +88,20 @@ export const reportAPI = {
     getEmployeeStats: () => api.get('/reports/employee-stats'),
     getTopConsumers: (limit = 10) => api.get(`/reports/top-consumers?limit=${limit}`),
     getFastMovingItems: () => api.get('/reports/fast-moving'),
+    
+    // New endpoints for enhanced reporting
+    getEmployeeActivity: (days = 30) => api.get(`/reports/employee-activity?days=${days}`),
+    getDailyLoginStats: (days = 30) => api.get(`/reports/daily-logins?days=${days}`),
+    getOnlineUsers: () => api.get('/reports/online-users'),
+    getStockFlow: (beverageId = null, days = 30) => {
+        const params = new URLSearchParams({ days: days.toString() });
+        if (beverageId) params.append('beverage_id', beverageId);
+        return api.get(`/reports/stock-flow?${params.toString()}`);
+    },
+    getInventoryTurnover: (days = 30) => api.get(`/reports/inventory-turnover?days=${days}`),
+    getComprehensiveAnalytics: (days = 30) => api.get(`/reports/analytics?days=${days}`),
+    
+    // Export methods
     exportPDF: (date) => `${EXPORT_BASE_URL}/reports/export/pdf?date=${date}`,
     exportExcel: (date) => `${EXPORT_BASE_URL}/reports/export/excel?date=${date}`,
 };

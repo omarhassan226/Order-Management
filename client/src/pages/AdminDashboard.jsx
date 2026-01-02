@@ -9,6 +9,7 @@ import { reportAPI, beverageAPI, orderAPI, userAPI, ratingAPI } from '../service
 import { Toast } from '../components/common/Toast';
 import NotificationPanel from '../components/common/NotificationPanel';
 import BackgroundSlider from '../components/BackgroundSlider';
+import { VITE_API_URL } from '../environment/development';
 import '../styles/admin.css';
 
 const TABS = [
@@ -98,7 +99,7 @@ const AdminDashboard = () => {
         try {
             const res = await beverageAPI.getAll();
             setBeverages(res.beverages || []);
-        } catch (error) {
+        } catch {
             Toast.error('فشل تحميل المشروبات');
         } finally {
             setLoading(false);
@@ -111,7 +112,7 @@ const AdminDashboard = () => {
         try {
             const res = await orderAPI.getToday();
             setOrders(res.orders || []);
-        } catch (error) {
+        } catch {
             Toast.error('فشل تحميل الطلبات');
         } finally {
             setLoading(false);
@@ -124,7 +125,7 @@ const AdminDashboard = () => {
         try {
             const res = await userAPI.getAll();
             setUsers(res.users || []);
-        } catch (error) {
+        } catch {
             Toast.error('فشل تحميل المستخدمين');
         } finally {
             setLoading(false);
@@ -160,7 +161,7 @@ const AdminDashboard = () => {
                 employee,
                 orders: res.orders || []
             });
-        } catch (error) {
+        } catch {
             Toast.error('فشل تحميل سجل الطلبات');
         }
     };
@@ -267,6 +268,77 @@ const AdminDashboard = () => {
             loadOrders();
         } catch (error) {
             Toast.error(error.message || 'فشل إلغاء الطلب');
+        }
+    };
+
+    // Download handlers with authentication
+    const handleDownloadPDF = async () => {
+        try {
+            setLoading(true);
+            const date = new Date().toISOString().split('T')[0];
+            const token = localStorage.getItem('auth_token');
+            
+            const response = await fetch(`${VITE_API_URL}/api/reports/export/pdf?date=${date}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('فشل تحميل التقرير');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `report-${date}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            Toast.success('تم تحميل التقرير بنجاح');
+        } catch (error) {
+            Toast.error(error.message || 'فشل تحميل التقرير');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDownloadExcel = async () => {
+        try {
+            setLoading(true);
+            const date = new Date().toISOString().split('T')[0];
+            const token = localStorage.getItem('auth_token');
+            
+            const response = await fetch(`${VITE_API_URL}/api/reports/export/excel?date=${date}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('فشل تحميل التقرير');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `report-${date}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            Toast.success('تم تحميل التقرير بنجاح');
+        } catch (error) {
+            Toast.error(error.message || 'فشل تحميل التقرير');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -711,22 +783,20 @@ const AdminDashboard = () => {
                                 <h3>📄 تصدير تقرير اليوم</h3>
                                 <p>تصدير تقرير شامل بجميع طلبات اليوم</p>
                                 <div className="report-actions">
-                                    <a
-                                        href={reportAPI.exportPDF(new Date().toISOString().split('T')[0])}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={handleDownloadPDF}
                                         className="btn-primary"
+                                        disabled={loading}
                                     >
                                         📥 تحميل PDF
-                                    </a>
-                                    <a
-                                        href={reportAPI.exportExcel(new Date().toISOString().split('T')[0])}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    </button>
+                                    <button
+                                        onClick={handleDownloadExcel}
                                         className="btn-secondary"
+                                        disabled={loading}
                                     >
                                         📊 تحميل Excel
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>

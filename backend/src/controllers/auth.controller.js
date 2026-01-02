@@ -10,7 +10,10 @@ class AuthController {
     async login(req, res, next) {
         try {
             const { username, password } = req.body;
-            const result = await authService.login(username, password);
+            const ipAddress = req.ip || req.connection.remoteAddress;
+            const userAgent = req.get('User-Agent');
+            
+            const result = await authService.login(username, password, ipAddress, userAgent);
             return response.success(res, result, 'Login successful');
         } catch (error) {
             next(error);
@@ -26,8 +29,14 @@ class AuthController {
         }
     }
 
-    async logout(req, res) {
-        return response.success(res, null, 'Logged out successfully');
+    async logout(req, res, next) {
+        try {
+            const sessionId = req.sessionId || null; // From token payload
+            await authService.logout(req.userId, sessionId);
+            return response.success(res, null, 'Logged out successfully');
+        } catch (error) {
+            next(error);
+        }
     }
 }
 

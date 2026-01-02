@@ -5,6 +5,7 @@
 
 const jwt = require('jsonwebtoken');
 const userRepository = require('../repositories/user.repository');
+const userSessionRepository = require('../repositories/userSession.repository');
 const { AuthenticationError } = require('../utils/error.util');
 const logger = require('../utils/logger.util');
 const env = require('../config/env');
@@ -13,7 +14,7 @@ class AuthService {
     /**
      * Login user with username and password
      */
-    async login(username, password) {
+    async login(username, password, ipAddress = null, userAgent = null) {
         try {
             // Find user by username
             const user = await userRepository.findByUsername(username);
@@ -31,14 +32,22 @@ class AuthService {
             // Update last login
             await user.updateLastLogin();
 
-            // Generate JWT token
-            const token = this.generateToken(user);
+            // Create session tracking
+            const session = await userSessionRepository.createSession(
+                user._id,
+                ipAddress,
+                userAgent
+            );
+
+            // Generate JWT token with session id
+            const token = this.generateToken(user, session._id);
 
             logger.info(`User ${username} logged in successfully`);
 
             return {
                 token,
                 user: user.toSafeObject(),
+                sessionId: session._id
             };
         } catch (error) {
             if (error instanceof AuthenticationError) throw error;
@@ -48,13 +57,35 @@ class AuthService {
     }
 
     /**
+     * Logout user and end session
+     */
+    async logout(userId, sessionId = null) {
+        try {
+            // If sessionId is provided, end that specific session
+            if (sessionId) {
+                await userSessionRepository.endSession(sessionId);
+            } else {
+                // Otherwise end all active sessions for the user
+                await userSessionRepository.endAllUserSessions(userId);
+            }
+
+            logger.info(`User ${userId} logged out successfully`);
+            return { success: true };
+        } catch (error) {
+            logger.error('Logout error:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Generate JWT token for user
      */
-    generateToken(user) {
+    generateToken(user, sessionId = null) {
         const payload = {
             id: user.id,
             username: user.username,
             role: user.role,
+            sessionId: sessionId
         };
 
         return jwt.sign(payload, env.JWT_SECRET, {

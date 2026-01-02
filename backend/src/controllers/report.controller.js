@@ -89,6 +89,66 @@ class ReportController {
             next(error);
         }
     }
+
+    async getEmployeeActivity(req, res, next) {
+        try {
+            const days = req.query.days ? parseInt(req.query.days) : 30;
+            const activityData = await reportService.getEmployeeActivity(days);
+            return response.success(res, { activityData }, 'Employee activity retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getDailyLoginStats(req, res, next) {
+        try {
+            const days = req.query.days ? parseInt(req.query.days) : 30;
+            const loginStats = await reportService.getDailyLoginStats(days);
+            return response.success(res, { loginStats }, 'Daily login stats retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getCurrentlyOnline(req, res, next) {
+        try {
+            const onlineUsers = await reportService.getCurrentlyOnlineUsers();
+            return response.success(res, { onlineUsers }, 'Online users retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getStockFlow(req, res, next) {
+        try {
+            const days = req.query.days ? parseInt(req.query.days) : 30;
+            const beverageId = req.query.beverage_id || null;
+            const stockFlow = await reportService.getStockFlowData(beverageId, days);
+            return response.success(res, { stockFlow }, 'Stock flow data retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getInventoryTurnover(req, res, next) {
+        try {
+            const days = req.query.days ? parseInt(req.query.days) : 30;
+            const turnoverData = await reportService.getInventoryTurnover(days);
+            return response.success(res, { turnoverData }, 'Inventory turnover retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getComprehensiveAnalytics(req, res, next) {
+        try {
+            const days = req.query.days ? parseInt(req.query.days) : 30;
+            const analytics = await reportService.getComprehensiveAnalytics(days);
+            return response.success(res, analytics, 'Comprehensive analytics retrieved successfully');
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ReportController();

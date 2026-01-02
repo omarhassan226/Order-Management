@@ -35,6 +35,7 @@ const authenticate = async (req, res, next) => {
         req.user = user;
         req.userId = user.id;
         req.userRole = user.role;
+        req.sessionId = decoded.sessionId; // Add sessionId for logout tracking
 
         next();
     } catch (error) {

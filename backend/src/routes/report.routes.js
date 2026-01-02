@@ -40,4 +40,22 @@ router.get('/export/pdf', reportController.exportPDF);
 // GET /api/reports/export/excel - Export Excel report
 router.get('/export/excel', reportController.exportExcel);
 
+// GET /api/reports/employee-activity - Get employee login/logout activity
+router.get('/employee-activity', reportController.getEmployeeActivity);
+
+// GET /api/reports/daily-logins - Get daily login statistics  
+router.get('/daily-logins', reportController.getDailyLoginStats);
+
+// GET /api/reports/online-users - Get currently online users
+router.get('/online-users', reportController.getCurrentlyOnline);
+
+// GET /api/reports/stock-flow - Get stock flow data for flowcharts
+router.get('/stock-flow', reportController.getStockFlow);
+
+// GET /api/reports/inventory-turnover - Get inventory turnover rates
+router.get('/inventory-turnover', reportController.getInventoryTurnover);
+
+// GET /api/reports/analytics - Get comprehensive analytics
+router.get('/analytics', reportController.getComprehensiveAnalytics);
+
 module.exports = router;
